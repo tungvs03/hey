@@ -3,24 +3,28 @@ import { Auth, Account } from "./auth.interface";
 import bcrypt from "bcrypt";
 import HttpException from "../../respone/http-exception";
 import Accounts from "./auth.model";
-import authRepo from "./auth.repository";
-import { Roles } from "../../assets/role.enums";
+import authRepo from "./auth.services";
+import { Roles, typeSearching } from "../../assets/enums";
 import HttpRespone from "../../respone/http-respone";
+import { findAccount } from "./auth.repository";
 
 export class AuthControllers {
   public async register(req: Request, res: Response) {
     let auth: Auth = { ...req.body };
 
     //check that username exist or not;
-    const account = await Accounts.findOne({ userName: auth.userName.toString() }).exec();
+    const account = await findAccount(auth.userName, typeSearching.userName);
 
     if ((Array.isArray(account) && account.length) || (account && Object.keys(account).length)) {
-      return res.status(400).send(new HttpException(400, `User name ${auth.userName} already existed!`));
+      return res.status(400).send(new HttpException(400, `Tài khoản ${auth.userName} đã tồn tại trong hệ thống!`));
     }
 
-    //check password and repassword:
+    // Decrypt password:
+    // const =
+
+    //check password and rePassword:
     if (auth.password !== auth.repassword) {
-        return res.status(400).send(new HttpException(400, "Password and repassword is not match!"));
+      return res.status(400).send(new HttpException(400, "Mật khẩu nhập lại không đúng!"));
     }
 
     const saltRounds = 10;
@@ -32,15 +36,15 @@ export class AuthControllers {
       const hashingAccount: Account = {
         userName: auth.userName,
         password: hashingPassword,
-        role: [Roles.USER],
+        roles: [Roles.USER],
       };
-      
+      console.log(hashingAccount)
       const data = await authRepo.insertAccount(hashingAccount);
 
       if (!data) {
         return res.status(400).send(new HttpRespone(400, "Có lỗi khi tạo người dùng mới", data));
       }
-
+     
       return res.status(201).send(new HttpRespone(201, "Tạo tài khoản mới thành công", data));
     });
   }
