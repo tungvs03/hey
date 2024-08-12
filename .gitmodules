@@ -1,0 +1,3 @@
+[submodule "hey-backend/hey-backend/hey_clone"]
+	path = hey-backend/hey-backend/hey_clone
+	url = https://github.com/tungvs03/hey_clone.git
