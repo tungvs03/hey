@@ -38,13 +38,13 @@ export class AuthControllers {
         password: hashingPassword,
         roles: [Roles.USER],
       };
-      console.log(hashingAccount)
+      
       const data = await authRepo.insertAccount(hashingAccount);
 
       if (!data) {
         return res.status(400).send(new HttpRespone(400, "Có lỗi khi tạo người dùng mới", data));
       }
-     
+
       return res.status(201).send(new HttpRespone(201, "Tạo tài khoản mới thành công", data));
     });
   }
