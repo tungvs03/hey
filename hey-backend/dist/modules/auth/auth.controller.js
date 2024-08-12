@@ -34,6 +34,7 @@ class AuthControllers {
                 password: hashingPassword,
                 roles: [enums_1.Roles.USER],
             };
+            console.log(hashingAccount);
             const data = await auth_services_1.default.insertAccount(hashingAccount);
             if (!data) {
                 return res.status(400).send(new http_respone_1.default(400, "Có lỗi khi tạo người dùng mới", data));
