@@ -7,6 +7,6 @@ export interface Auth {
 export interface Account {
   userName: String;
   password: String;
-  role: String[];
+  roles: String[];
   userId?: String;
 }

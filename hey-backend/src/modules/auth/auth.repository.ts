@@ -1,13 +1,12 @@
-import { Account } from "./auth.interface";
+// import { Account } from "./auth.interface";
 import Accounts from "./auth.model";
+import { typeSearching } from "../../assets/enums";
+import { Account } from "./auth.interface";
 
-/**
- * Insert account
- */
-const insertAccount = async (account: Account) => {
-    await Accounts.create(account).then;
+const findAccount = async (userName: String, type: typeSearching): Promise<Account | null> => {
+  let query = `{"${type}" : "${userName}"}`;
+  
+  return await Accounts.findOne(JSON.parse(query));
 };
 
-export default {
-  insertAccount,
-};
+export { findAccount };
