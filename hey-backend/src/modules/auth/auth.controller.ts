@@ -1,51 +1,65 @@
-import { Request, Response } from "express";
-import { Auth, Account } from "./auth.interface";
+import {Request, Response} from "express";
+import {Account, Auth} from "./auth.interface";
 import bcrypt from "bcrypt";
 import HttpException from "../../respone/http-exception";
-import Accounts from "./auth.model";
-import authRepo from "./auth.services";
-import { Roles, typeSearching } from "../../assets/enums";
+import {Roles, typeSearching} from "../../assets/enums";
 import HttpRespone from "../../respone/http-respone";
-import { findAccount } from "./auth.repository";
+import {checkExistAccount} from "./auth.services";
+import {insertAccount} from "./auth.repository";
 
 export class AuthControllers {
   public async register(req: Request, res: Response) {
-    let auth: Auth = { ...req.body };
-
+    let auth: Auth = {...req.body};
+    
     //check that username exist or not;
-    const account = await findAccount(auth.userName, typeSearching.userName);
-
-    if ((Array.isArray(account) && account.length) || (account && Object.keys(account).length)) {
-      return res.status(400).send(new HttpException(400, `Tài khoản ${auth.userName} đã tồn tại trong hệ thống!`));
-    }
-
-    // Decrypt password:
-    // const =
-
-    //check password and rePassword:
-    if (auth.password !== auth.repassword) {
-      return res.status(400).send(new HttpException(400, "Mật khẩu nhập lại không đúng!"));
-    }
-
-    const saltRounds = 10;
-    bcrypt.hash(auth.password.toString(), saltRounds, async function (err, hashingPassword) {
-      if (err) {
-        console.error(err);
-      }
-
-      const hashingAccount: Account = {
-        userName: auth.userName,
-        password: hashingPassword,
-        roles: [Roles.USER],
-      };
-      console.log(hashingAccount)
-      const data = await authRepo.insertAccount(hashingAccount);
-
-      if (!data) {
-        return res.status(400).send(new HttpRespone(400, "Có lỗi khi tạo người dùng mới", data));
-      }
-     
-      return res.status(201).send(new HttpRespone(201, "Tạo tài khoản mới thành công", data));
-    });
+    const account = checkExistAccount(auth.userName, typeSearching.userName)
+      .then(
+        (dataReturn) => {
+          if (dataReturn) {
+            return res.status(400).send(new HttpException(400, "Tài khoản này đã tồn tại trong hệ thống!"));
+          } else {
+            if (auth.password !== auth.repassword) {
+              return res.status(400).send(new HttpException(400, "Mật khẩu nhập lại không đúng!"));
+            }
+            
+            const saltRounds = 10;
+            bcrypt.hash(auth.password.toString(), saltRounds, async function (err, hashingPassword) {
+              if (err) {
+                console.error(err);
+              }
+              
+              const hashingAccount: Account = {
+                userName: auth.userName,
+                password: hashingPassword,
+                roles: [Roles.USER],
+              };
+              
+              const data = insertAccount(hashingAccount)
+                .then((dataReturn) => {
+                  console.log(dataReturn)
+                  return res.status(201).send(new HttpRespone(201, "Tạo người dùng mới thành công!", dataReturn))
+                })
+                .catch(
+                  (err) => {
+                    console.error(err.toString());
+                    return res.status(500).send(new HttpException(500, "Hệ thống xảy ra lỗi!"));
+                  }
+                )
+              
+              if (!data) {
+                return res.status(400).send(new HttpException(400, "Có lỗi khi tạo người dùng mới"));
+              }
+              
+              return res.status(201).send(new HttpRespone(201, "Tạo tài khoản mới thành công", data));
+            });
+          }
+        }
+      )
+      .catch(
+        (err) => {
+          console.error(err.toString());
+          return res.status(500).send(new HttpException(500, "Hệ thống xảy ra lỗi!"));
+        }
+      )
   }
 }
