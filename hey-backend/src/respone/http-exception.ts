@@ -1,5 +1,4 @@
 
-
 export default class HttpException{
     status: number;
     message: string;
@@ -8,6 +7,4 @@ export default class HttpException{
         this.message = message;
         this.status = status;
     }
-
-    
 }

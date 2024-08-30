@@ -8,11 +8,15 @@ import {checkExistAccount} from "./auth.services";
 import {insertAccount} from "./auth.repository";
 
 export class AuthControllers {
+
   public async register(req: Request, res: Response) {
     let auth: Auth = {...req.body};
     
+
+    // const checkExistAccount = await checkExistAccount(auth.userName, typeSearching.userName);
+
     //check that username exist or not;
-    const account = checkExistAccount(auth.userName, typeSearching.userName)
+    checkExistAccount(auth.userName, typeSearching.userName)
       .then(
         (dataReturn) => {
           if (dataReturn) {
@@ -36,12 +40,10 @@ export class AuthControllers {
               
               const data = insertAccount(hashingAccount)
                 .then((dataReturn) => {
-                  console.log(dataReturn)
                   return res.status(201).send(new HttpRespone(201, "Tạo người dùng mới thành công!", dataReturn))
                 })
                 .catch(
                   (err) => {
-                    console.error(err.toString());
                     return res.status(500).send(new HttpException(500, "Hệ thống xảy ra lỗi!"));
                   }
                 )
@@ -57,9 +59,9 @@ export class AuthControllers {
       )
       .catch(
         (err) => {
-          console.error(err.toString());
           return res.status(500).send(new HttpException(500, "Hệ thống xảy ra lỗi!"));
         }
       )
   }
 }
+
