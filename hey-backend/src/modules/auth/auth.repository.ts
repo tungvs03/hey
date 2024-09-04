@@ -9,10 +9,12 @@ const insertAccount = (account: Account): Promise<any> => {
 };
 
 /**
- * Find acocunt
+ * Find accocunt
  */
-const findAccount = (query: string): Promise<any> => {
-  return Accounts.findOne(JSON.parse(query));
+const findAccount = async (filter: {} = {}, projection: any = null, options: {} = {}) => {
+
+  return await Accounts.findOne(filter, projection, options);
+  
 }
 
 
