@@ -1,10 +1,13 @@
 
 export default class HttpException{
-    status: number;
+    statusCode: number;
+    status: boolean;
     message: string;
+    
 
-    constructor(status: number, message: string){
+    constructor(statusCode: number, message: string){
+        this.statusCode = statusCode;
         this.message = message;
-        this.status = status;
+        this.status = false;
     }
 }

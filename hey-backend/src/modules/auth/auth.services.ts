@@ -23,7 +23,7 @@ const resgister = async ({account}: {account: Auth}) => {
 
     const accountExisted = await findAccount({userName: account.userName});
 
-    if(account) {
+    if(accountExisted) {
         return Exception.ERR_BAD_REQUEST(`${account.userName} is already existed`);
     }
 

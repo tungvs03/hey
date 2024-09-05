@@ -9,4 +9,8 @@ export class Exception extends HttpException {
         return new HttpException(404, "ERR DATA NOT FOUND!");
     }
 
+    public static ERR_INTERNAL_SERVER = (message: string = "ERR INTERNAL SERVER!") => {
+        return new HttpException(500, message);
+    }
+
 }
